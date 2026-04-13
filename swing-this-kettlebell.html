@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Swing This KB">
+<meta name="theme-color" content="#0d1a12">
+<title>Swing This Kettlebell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1a12;
+  --surface: #13221a;
+  --surface2: #1a2d22;
+  --accent: #3ddc84;
+  --accent-dim: #1f6e42;
+  --accent-glow: rgba(61,220,132,0.15);
+  --text: #e8f5ee;
+  --text-muted: #7aab8a;
+  --border: rgba(61,220,132,0.18);
+  --border-strong: rgba(61,220,132,0.35);
+  --done-opacity: 0.35;
+  --radius: 10px;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.app-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+.app-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* TAB NAV */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 53px;
+  z-index: 99;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* MAIN CONTENT */
+.main { padding: 20px 16px 80px; max-width: 600px; margin: 0 auto; }
+
+/* SESSION PANELS */
+.session { display: none; }
+.session.active { display: block; }
+
+/* SESSION HEADER */
+.session-meta {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.session-name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.1;
+}
+.focus-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-dim);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* PROGRESS */
+.progress-wrap {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.progress-track {
+  flex: 1;
+  height: 3px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+.progress-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: right;
+}
+.reset-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: color 0.15s, border-color 0.15s;
+}
+.reset-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+/* SECTION */
+.section { margin-bottom: 22px; }
+.section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* EXERCISE ROWS */
+.ex-list { display: flex; flex-direction: column; gap: 5px; }
+.ex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: opacity 0.2s, border-color 0.2s;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ex-row:active { background: var(--surface2); }
+.ex-row.done {
+  opacity: var(--done-opacity);
+  border-color: transparent;
+}
+.check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-dim);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  pointer-events: none;
+}
+.ex-row.done .check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.check svg { display: none; }
+.ex-row.done .check svg { display: block; }
+.ex-info { flex: 1; }
+.ex-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; margin-bottom: 2px; color: var(--text); }
+.ex-sets { font-size: 11px; color: var(--text-muted); }
+.ex-note { font-size: 11px; color: var(--text-muted); margin-top: 3px; opacity: 0.75; }
+
+/* CONDITIONING BLOCK */
+.cond-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.cond-header {
+  padding: 9px 12px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.cond-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.cond-item:last-child { border-bottom: none; }
+.cond-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.cond-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* NOTES */
+.notes {
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-top: 8px;
+}
+.notes strong { color: var(--accent); font-weight: 500; }
+
+/* TIMER (Day 4) */
+.timer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.timer-display {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.timer-btns { display: flex; gap: 8px; justify-content: center; }
+.timer-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.15s;
+}
+.timer-btn:hover { background: var(--surface2); }
+.timer-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 500; }
+.timer-btn.primary:hover { background: #5de89a; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <span class="app-title">Swing This Kettlebell</span>
+  <span class="app-subtitle">Program</span>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="show(0)">Session 1</button>
+  <button class="tab-btn" onclick="show(1)">Session 2</button>
+  <button class="tab-btn" onclick="show(2)">Session 3</button>
+  <button class="tab-btn" onclick="show(3)">Day 4 ✦ Optional</button>
+</nav>
+
+<main class="main">
+
+  <!-- SESSION 1 -->
+  <div class="session active" id="s0">
+    <p class="session-meta">Session 1 of 4</p>
+    <h1 class="session-name">Hip hinge<br>foundations</h1>
+    <div class="focus-tags">
+      <span class="tag">Hip hinge</span>
+      <span class="tag">Torso stability</span>
+      <span class="tag">Glute engagement</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="p0"></div></div>
+      <span class="progress-text" id="pt0">0/0</span>
+      <button class="reset-btn" onclick="reset(0)">reset</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">A — Mobility · repeat circuit 2×</div>
+      <div class="ex-list" id="g0">
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Halo</div><div class="ex-sets">10 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Cat / Cow</div><div class="ex-sets">10 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Birddog</div><div class="ex-sets">3 each side · 6 sec hold</div></div></div>
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Glute bridge</div><div class="ex-sets">10 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">McGill curl-up</div><div class="ex-sets">8 reps each leg side</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">B — Main · 3 sets · left to right before moving on</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">KB deadlift</div><div class="ex-sets">3 × 6–8 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">TRX or BW push-up</div><div class="ex-sets">3 × 6–10 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,0)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">KB swing</div><div class="ex-sets">3–4 × 10 reps</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">C — Conditioning · 4–5 rounds · rest 1 min</div>
+      <div class="cond-block">
+        <div class="cond-header">Per round</div>
+        <div class="cond-item"><div class="cond-dot"></div><div>15 sec jumping jacks or high knees</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>12 KB swings</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>5 push-ups</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>10 McGill curl-ups</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>15 sec battle ropes or jump rope</div></div>
+      </div>
+    </div>
+
+    <div class="notes">Rest as needed while you learn. Focus on form, not speed.</div>
+  </div>
+
+  <!-- SESSION 2 -->
+  <div class="session" id="s1">
+    <p class="session-meta">Session 2 of 4</p>
+    <h1 class="session-name">Press &amp; pull<br>mechanics</h1>
+    <div class="focus-tags">
+      <span class="tag">Press mechanics</span>
+      <span class="tag">Pull mechanics</span>
+      <span class="tag">Torso stability</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="p1"></div></div>
+      <span class="progress-text" id="pt1">0/0</span>
+      <button class="reset-btn" onclick="reset(1)">reset</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Mobility · repeat 2×</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Slingshot</div><div class="ex-sets">10 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Cat / Camel</div><div class="ex-sets">10 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Birddog</div><div class="ex-sets">3 each side · 6 sec hold</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">SLDL</div><div class="ex-sets">5 reps each side</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Main · 3 sets each</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">1-arm KB row</div><div class="ex-sets">3 × 8 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">KB dead clean</div><div class="ex-sets">3 × 4–6 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Low windmill</div><div class="ex-sets">3 × 3 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">KB overhead press</div><div class="ex-sets">3 × 8 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,1)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">KB clean (normal)</div><div class="ex-sets">3 × 6 each side</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Conditioning · 3–5 rounds · rest 1–2 min</div>
+      <div class="cond-block">
+        <div class="cond-header">Per round</div>
+        <div class="cond-item"><div class="cond-dot"></div><div>3 dead cleans each side</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>6 KB overhead press each side</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>6 one-arm KB row each side</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>8 up-downs</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>15 sec battle ropes or jump rope</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION 3 -->
+  <div class="session" id="s2">
+    <p class="session-meta">Session 3 of 4</p>
+    <h1 class="session-name">Turkish get-up<br>deconstruction</h1>
+    <div class="focus-tags">
+      <span class="tag">Torso strength</span>
+      <span class="tag">Coordination</span>
+      <span class="tag">Shoulder mobility</span>
+      <span class="tag">Legs</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="p2"></div></div>
+      <span class="progress-text" id="pt2">0/0</span>
+      <button class="reset-btn" onclick="reset(2)">reset</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Mobility · repeat 2×</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Lateral lunges</div><div class="ex-sets">6 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Cat / Camel w/ shoulder rotation</div><div class="ex-sets">10 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Birddog</div><div class="ex-sets">3 each side · 6 sec hold</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Side plank</div><div class="ex-sets">15 sec each side</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Main · rest as needed between sets</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">TGU sit-up</div><div class="ex-sets">2 × 8 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">TGU hip bridge</div><div class="ex-sets">2 × 8 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Bridge leg kick-through</div><div class="ex-sets">2 × 5 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Lunge windmill</div><div class="ex-sets">2 × 5 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">KB overhead lunge</div><div class="ex-sets">2 × 5–6 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,2)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Full TGU</div><div class="ex-sets">3 each side</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Conditioning · 4–5 rounds · rest 1–2 min</div>
+      <div class="cond-block">
+        <div class="cond-header">Per round</div>
+        <div class="cond-item"><div class="cond-dot"></div><div>20 sec battle ropes or jump rope</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>15 sec side plank each side</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>1 TGU each side</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>15–20 sec mountain climbers</div></div>
+        <div class="cond-item"><div class="cond-dot"></div><div>30 sec KB swing</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION 4 — OPTIONAL TEST DAY -->
+  <div class="session" id="s3">
+    <p class="session-meta">Day 4 — Optional</p>
+    <h1 class="session-name">Beginner<br>base test</h1>
+    <div class="focus-tags">
+      <span class="tag">Testing</span>
+      <span class="tag">Endurance</span>
+      <span class="tag">Adaptability</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="p3"></div></div>
+      <span class="progress-text" id="pt3">0/0</span>
+      <button class="reset-btn" onclick="reset(3)">reset</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Stopwatch — track your total time</div>
+      <div class="timer-card">
+        <div class="timer-display" id="timer-display">00:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn primary" id="timer-start" onclick="timerToggle()">Start</button>
+          <button class="timer-btn" onclick="timerReset()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Mobility · repeat 2×</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Halo</div><div class="ex-sets">10 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Cat / Camel</div><div class="ex-sets">10 reps</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Birddog</div><div class="ex-sets">3 each side · 6 sec hold</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Lateral lunges</div><div class="ex-sets">5 each side</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">Dead bug</div><div class="ex-sets">6 each side</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Test — chip away in any order · all reps must be completed</div>
+      <div class="ex-list">
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">60 KB swings</div><div class="ex-sets">Two-handed, hand-to-hand, or one-arm</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">50 BW squats</div><div class="ex-sets">Floor or unstable object (BOSU preferred)</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">40 clean and press</div><div class="ex-sets">Pendulum clean — not from floor</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">30 push-ups</div><div class="ex-sets">Full range — no cheating</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">1 min battle rope thrash</div><div class="ex-sets">Sub: up-downs if no rope</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">10 TGU</div><div class="ex-sets">Modify as needed · sub: half TGU</div></div></div>
+        <div class="ex-row" onclick="chk(this,3)"><div class="check"><svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#0d1a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ex-info"><div class="ex-name">1000m row erg</div><div class="ex-sets">Level 5+ · sub: bike, jog, treadmill, elliptical, Airdyne</div></div></div>
+      </div>
+    </div>
+
+    <div class="notes"><strong>First time:</strong> time doesn't matter — do it safely. Record your time and weights. Next time, aim to beat both with the same variables.</div>
+  </div>
+
+</main>
+
+<script>
+var counts = [0,0,0,0];
+
+function show(idx) {
+  document.querySelectorAll('.session').forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
+  updateProgress(idx);
+}
+
+function chk(row, s) {
+  row.classList.toggle('done');
+  updateProgress(s);
+}
+
+function updateProgress(s) {
+  var rows = document.querySelectorAll('#s'+s+' .ex-row');
+  var total = rows.length;
+  var done = 0;
+  rows.forEach(function(r){ if(r.classList.contains('done')) done++; });
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('p'+s).style.width = pct+'%';
+  document.getElementById('pt'+s).textContent = done+'/'+total;
+}
+
+function reset(s) {
+  document.querySelectorAll('#s'+s+' .ex-row').forEach(function(r){ r.classList.remove('done'); });
+  updateProgress(s);
+}
+
+// Stopwatch
+var timerInterval = null;
+var timerSeconds = 0;
+var timerRunning = false;
+
+function timerToggle() {
+  if(timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timer-start').textContent = 'Resume';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-start').textContent = 'Pause';
+    timerInterval = setInterval(function(){
+      timerSeconds++;
+      var m = Math.floor(timerSeconds/60);
+      var s = timerSeconds%60;
+      document.getElementById('timer-display').textContent =
+        (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    }, 1000);
+  }
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  document.getElementById('timer-display').textContent = '00:00';
+  document.getElementById('timer-start').textContent = 'Start';
+}
+
+[0,1,2,3].forEach(updateProgress);
+</script>
+</body>
+</html>
